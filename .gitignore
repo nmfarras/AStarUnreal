@@ -1,6 +1,7 @@
 .idea
 .vs
 .vscode
+.vsconfig
 
 /Binaries
 Build

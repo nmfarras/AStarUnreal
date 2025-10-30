@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PathfindingGrid.h"
-#include "Core/Public/HAL/RunnableThread.h"
+// #include "Core/Public/HAL/RunnableThread.h"
 #include "GameFramework/Actor.h"
 #include "Pathfinder.generated.h"
 
