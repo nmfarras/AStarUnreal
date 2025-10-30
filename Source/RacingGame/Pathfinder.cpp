@@ -37,7 +37,9 @@ FVector APathfinder::FindPath(FVector Start, FVector End)
 	PathfindingNode* StartNode = GridInstance->NodeFromLocation(Start);	// Start node of the agent
 	PathfindingNode* EndNode = GridInstance->NodeFromLocation(End);	// End goal node of the agent
 
-
+	if (EndNode == nullptr) {
+		EndNode = StartNode;
+	}
 
 	if (StartNode == nullptr) return Start;
 
@@ -99,6 +101,66 @@ FVector APathfinder::FindPath(FVector Start, FVector End)
 
 
 	return GridInstance->LocationFromNode(StartNode);	// No path found
+}
+
+TArray<FVector> APathfinder::FindFullPath(FVector Start, FVector End)
+{
+	TArray<FVector> PathPoints;
+
+	PathfindingNode* StartNode = GridInstance->NodeFromLocation(Start);
+	PathfindingNode* EndNode = GridInstance->NodeFromLocation(End);
+	if (!StartNode || !EndNode) return PathPoints;
+
+	TArray<PathfindingNode*> OpenSet;
+	TArray<PathfindingNode*> ClosedSet;
+	OpenSet.Add(StartNode);
+
+	while (OpenSet.Num() > 0)
+	{
+		PathfindingNode* CurrentNode = OpenSet[0];
+		for (PathfindingNode* Node : OpenSet)
+		{
+			if (Node->FCost() < CurrentNode->FCost() ||
+				(Node->FCost() == CurrentNode->FCost() && Node->HCost < CurrentNode->HCost))
+			{
+				CurrentNode = Node;
+			}
+		}
+
+		OpenSet.Remove(CurrentNode);
+		ClosedSet.Add(CurrentNode);
+
+		if (CurrentNode == EndNode)
+		{
+			// Retrace full path
+			PathfindingNode* Trace = EndNode;
+			while (Trace != StartNode)
+			{
+				PathPoints.Add(GridInstance->LocationFromNode(Trace));
+				Trace = Trace->ParentNode;
+				if (!Trace) break;
+			}
+			Algo::Reverse(PathPoints);
+			return PathPoints;
+		}
+
+		for (PathfindingNode* Neighbour : GridInstance->GetNeighbourNodes(CurrentNode))
+		{
+			if (!Neighbour || ClosedSet.Contains(Neighbour)) continue;
+
+			float NewCost = CurrentNode->GCost + GetDistance(CurrentNode, Neighbour);
+			if (NewCost < Neighbour->GCost || !OpenSet.Contains(Neighbour))
+			{
+				Neighbour->GCost = NewCost;
+				Neighbour->HCost = GetDistance(Neighbour, EndNode);
+				Neighbour->ParentNode = CurrentNode;
+				if (!OpenSet.Contains(Neighbour))
+					OpenSet.Add(Neighbour);
+			}
+		}
+	}
+
+	return PathPoints; // empty if unreachable
 }
 
 float APathfinder::GetDistance(PathfindingNode* A, PathfindingNode* B)

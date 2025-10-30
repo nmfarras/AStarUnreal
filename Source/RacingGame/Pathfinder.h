@@ -32,6 +32,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AStar")
 	FVector FindPath(FVector Start, FVector End);
 
+	UFUNCTION(BlueprintCallable, Category = "AStar")
+	TArray<FVector> FindFullPath(FVector Start, FVector End);
+
 	//UFUNCTION(BlueprintCallable, Category = "Navigation-GL")
 		//void DrawPath(TArray<PathfindingNode*> Path);
 

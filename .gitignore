@@ -1,0 +1,11 @@
+.idea
+.vs
+.vscode
+
+/Binaries
+Build
+DerivedDataCache
+Intermediate
+Saved
+
+RacingGame.sln.DotSettings.user
